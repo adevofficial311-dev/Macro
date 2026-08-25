@@ -1,0 +1,6 @@
+{
+  "name": "CokeBoys Client - Macro Hub",
+  "description": "High performance gaming macro hub and combo database with verified loadouts and JSON configurations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

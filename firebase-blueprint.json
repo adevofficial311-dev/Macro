@@ -1,0 +1,106 @@
+{
+  "rules": [
+    {
+      "collection": "users",
+      "read": "request.auth != null",
+      "write": "request.auth != null && request.auth.uid == document"
+    },
+    {
+      "collection": "macros",
+      "read": "true",
+      "write": "request.auth != null"
+    },
+    {
+      "collection": "comments",
+      "read": "true",
+      "write": "request.auth != null"
+    },
+    {
+      "collection": "notifications",
+      "read": "request.auth != null && resource.data.user_id == request.auth.uid",
+      "write": "request.auth != null"
+    },
+    {
+      "collection": "game_profiles",
+      "read": "request.auth != null",
+      "write": "request.auth != null"
+    },
+    {
+      "collection": "creatures",
+      "read": "request.auth != null",
+      "write": "request.auth != null"
+    }
+  ],
+  "collections": {
+    "users": {
+      "schema": {
+        "username": "string",
+        "display_name": "string",
+        "avatar_url": "string?",
+        "created_at": "timestamp"
+      }
+    },
+    "macros": {
+      "schema": {
+        "creator_id": "string",
+        "creator_username": "string",
+        "creator_avatar": "string?",
+        "title": "string",
+        "fruit": "string?",
+        "sword": "string?",
+        "melee": "string?",
+        "gun": "string?",
+        "macro_type": "string",
+        "bounty_boost": "string?",
+        "video_url": "string?",
+        "macro_json": "string",
+        "comment_count": "number",
+        "view_count": "number",
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+      }
+    },
+    "comments": {
+      "schema": {
+        "macro_id": "string",
+        "user_id": "string",
+        "username": "string",
+        "avatar_url": "string?",
+        "content": "string",
+        "created_at": "timestamp"
+      }
+    },
+    "notifications": {
+      "schema": {
+        "user_id": "string",
+        "type": "string",
+        "message": "string",
+        "related_macro_id": "string?",
+        "related_comment_id": "string?",
+        "read": "boolean",
+        "created_at": "timestamp"
+      }
+    },
+    "game_profiles": {
+      "schema": {
+        "user_id": "string",
+        "username": "string",
+        "level": "number",
+        "xp": "number",
+        "coins": "number"
+      }
+    },
+    "creatures": {
+      "schema": {
+        "game_profile_id": "string",
+        "user_id": "string",
+        "creature_type": "string",
+        "name": "string",
+        "level": "number",
+        "xp": "number",
+        "stats": "map",
+        "created_at": "timestamp"
+      }
+    }
+  }
+}
