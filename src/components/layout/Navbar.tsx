@@ -1,12 +1,14 @@
 import { Link, useLocation } from 'react-router';
-import { Menu, X, PlusCircle, Type, Sparkles } from 'lucide-react';
+import { Menu, X, PlusCircle, Type, ShieldCheck, User } from 'lucide-react';
 import { useState } from 'react';
 import { useFont } from '../../context/FontContext';
+import { useAuthProfile } from '../../context/AuthProfileContext';
 
-export function Navbar() {
+export function Navbar({ setProfileOpen, setAdminOpen }: { setProfileOpen: (v: boolean) => void, setAdminOpen: (v: boolean) => void }) {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { openModal, currentPreset } = useFont();
+  const { openModal } = useFont();
+  const { profile, isAdmin } = useAuthProfile();
   
   const links = [
     { name: 'Home', path: '/' },
@@ -22,133 +24,29 @@ export function Navbar() {
           <span className="text-cb-yellow">BOYS</span>
         </Link>
         
-        {/* Navigation Links & Font Tab */}
-        <div className="hidden md:flex items-center gap-1 lg:gap-2 bg-cb-surface/60 border border-cb-border rounded-xl p-1.5 backdrop-blur-sm">
+        {/* Navigation Links */}
+        <div className="hidden md:flex items-center gap-1 lg:gap-2">
           {links.map((link) => {
-            const isActive = link.path === '/' 
-              ? location.pathname === '/' 
-              : location.pathname.startsWith(link.path);
-
+            const isActive = link.path === '/' ? location.pathname === '/' : location.pathname.startsWith(link.path);
             return (
-              <Link
-                key={link.name}
-                to={link.path}
-                className={`text-xs lg:text-sm font-medium px-3.5 py-2 rounded-lg transition-all ${
-                  isActive 
-                    ? 'bg-cb-yellow text-black font-semibold shadow-sm' 
-                    : 'text-cb-text-muted hover:text-white hover:bg-cb-surface'
-                }`}
-              >
+              <Link key={link.name} to={link.path} className={`text-xs lg:text-sm font-medium px-3.5 py-2 rounded-lg transition-all ${isActive ? 'bg-cb-yellow text-black font-semibold' : 'text-cb-text-muted hover:text-white hover:bg-cb-surface'}`}>
                 {link.name}
               </Link>
             );
           })}
-
-          {/* Font Changer Navigation Tab Button */}
-          <button
-            onClick={openModal}
-            className="text-xs lg:text-sm font-medium px-3.5 py-2 rounded-lg text-cb-text-muted hover:text-cb-yellow hover:bg-cb-surface transition-all flex items-center gap-1.5 border border-transparent hover:border-cb-border cursor-pointer group"
-            title="Customize Website Font"
-          >
-            <Type size={14} className="text-cb-yellow group-hover:scale-110 transition-transform" />
-            <span>Fonts</span>
-            <span className="text-[10px] px-1.5 py-0.2 rounded bg-cb-surface border border-cb-border/80 text-cb-yellow font-mono hidden xl:inline-block">
-              {currentPreset.name.split(' ')[0]}
-            </span>
-          </button>
         </div>
 
-        {/* CTA Button & Quick Font Changer */}
-        <div className="hidden md:flex items-center gap-2 lg:gap-3">
-          <button
-            onClick={openModal}
-            className="bg-cb-surface hover:bg-cb-surface-hover border border-cb-border hover:border-cb-yellow/50 text-cb-text-muted hover:text-white inline-flex items-center justify-center font-bold transition-all rounded-lg h-10 px-3 text-xs gap-1.5 cursor-pointer active:scale-95"
-            title="Open Font Customizer"
-          >
-            <Sparkles size={14} className="text-cb-yellow" />
-            <span className="hidden lg:inline">Style</span>
-          </button>
-
-          <Link 
-            to="/publish"
-            className="bg-cb-red hover:bg-cb-red-hover text-white shadow-md shadow-cb-red/20 inline-flex items-center justify-center font-bold transition-all rounded-lg h-10 px-4 text-xs lg:text-sm gap-2 active:scale-95 whitespace-nowrap"
-          >
-            <PlusCircle size={15} />
-            <span>Publish Macro</span>
-          </Link>
-        </div>
-
-        {/* Mobile quick controls & menu button */}
-        <div className="flex items-center gap-2 md:hidden">
-          <button
-            onClick={openModal}
-            className="p-2 rounded-lg bg-cb-surface border border-cb-border text-cb-yellow hover:text-white transition-colors flex items-center gap-1 text-xs font-bold"
-            aria-label="Change Font"
-          >
-            <Type size={16} />
-            <span className="text-[11px]">Fonts</span>
-          </button>
-
-          <button 
-            className="p-2 rounded-lg bg-cb-surface border border-cb-border text-cb-text-muted hover:text-white transition-colors"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Toggle menu"
-          >
-            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+        {/* Profile & Admin Buttons */}
+        <div className="flex items-center gap-2">
+            <button onClick={() => setAdminOpen(true)} className={`p-2 rounded-lg border flex items-center gap-1 ${isAdmin ? 'bg-emerald-900 border-emerald-700 text-emerald-400' : 'bg-cb-surface border-cb-border text-cb-text-muted'}`}>
+                <ShieldCheck size={16} />
+            </button>
+            <button onClick={() => setProfileOpen(true)} className="flex items-center gap-2 px-3 py-1 bg-cb-surface border border-cb-border rounded-full">
+                <img src={profile.avatar} className="w-6 h-6 rounded-full" />
+                <span className="text-xs text-white">{profile.username}</span>
+            </button>
         </div>
       </div>
-
-      {/* Mobile Menu */}
-      {mobileOpen && (
-        <div className="absolute top-[72px] left-0 right-0 bg-cb-bg/95 backdrop-blur-xl border-b border-cb-border md:hidden p-5 flex flex-col gap-3 shadow-2xl">
-          {links.map((link) => {
-            const isActive = link.path === '/' 
-              ? location.pathname === '/' 
-              : location.pathname.startsWith(link.path);
-
-            return (
-              <Link
-                key={link.name}
-                to={link.path}
-                onClick={() => setMobileOpen(false)}
-                className={`text-base font-medium px-4 py-3 rounded-lg transition-colors ${
-                  isActive 
-                    ? 'bg-cb-yellow text-black font-bold' 
-                    : 'text-cb-text-muted hover:text-white hover:bg-cb-surface'
-                }`}
-              >
-                {link.name}
-              </Link>
-            );
-          })}
-
-          <button
-            onClick={() => {
-              setMobileOpen(false);
-              openModal();
-            }}
-            className="text-base font-medium px-4 py-3 rounded-lg bg-cb-surface border border-cb-border text-left text-cb-yellow flex items-center justify-between transition-colors"
-          >
-            <span className="flex items-center gap-2 font-bold">
-              <Type size={18} />
-              <span>Change Font Preset</span>
-            </span>
-            <span className="text-xs px-2 py-0.5 rounded bg-cb-bg text-cb-text-muted font-mono">
-              {currentPreset.name}
-            </span>
-          </button>
-
-          <Link 
-            to="/publish"
-            onClick={() => setMobileOpen(false)}
-            className="bg-cb-red hover:bg-cb-red-hover text-white shadow-md shadow-cb-red/20 w-full inline-flex items-center justify-center font-bold transition-all rounded-lg h-12 text-base mt-2 gap-2"
-          >
-            <PlusCircle size={18} />
-            <span>Publish Macro</span>
-          </Link>
-        </div>
-      )}
     </nav>
   );
 }
