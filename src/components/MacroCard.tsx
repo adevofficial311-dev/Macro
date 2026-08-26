@@ -1,13 +1,18 @@
 import { FC } from 'react';
 import { Link } from 'react-router';
-import { Play, MessageSquare, Flame, ArrowUpRight } from 'lucide-react';
+import { Play, MessageSquare, Flame, ArrowUpRight, Trash2 } from 'lucide-react';
 import { Macro } from '../types';
+import { useAuthProfile } from '../context/AuthProfileContext';
+import { doc, deleteDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 interface MacroCardProps {
   macro: Macro;
 }
 
 export const MacroCard: FC<MacroCardProps> = ({ macro }) => {
+  const { isAdmin } = useAuthProfile();
+
   const getTypeBadgeClass = (type: string) => {
     const t = type.toLowerCase();
     if (t.includes('one shot')) {
@@ -19,6 +24,21 @@ export const MacroCard: FC<MacroCardProps> = ({ macro }) => {
     return 'bg-cb-surface text-white border-cb-border';
   };
 
+  const handleDelete = async () => {
+    console.log('Attempting to delete macro:', macro.id);
+    // Remove confirm to test mobile compatibility
+    try {
+        console.log('Proceeding to delete:', macro.id);
+        const docRef = doc(db, 'macros', macro.id);
+        await deleteDoc(docRef);
+        console.log('Macro deleted successfully from Firestore.');
+        alert('Deleted successfully');
+    } catch (error) {
+        console.error('Error deleting macro from Firestore:', error);
+        alert('Error: ' + error);
+    }
+  };
+
   return (
     <div className="bg-cb-surface/80 backdrop-blur-sm border border-cb-border rounded-2xl overflow-hidden flex flex-col hover:border-cb-yellow/50 transition-all duration-300 group shadow-lg hover:shadow-cb-yellow/5">
       <div className="p-5 flex-1 flex flex-col">
@@ -26,7 +46,12 @@ export const MacroCard: FC<MacroCardProps> = ({ macro }) => {
           <span className={`inline-flex px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border ${getTypeBadgeClass(macro.macro_type)}`}>
             {macro.macro_type}
           </span>
-          {macro.video_url && (
+          {isAdmin && (
+            <button onClick={handleDelete} className="text-red-500 hover:text-red-400 p-1">
+              <Trash2 size={16} />
+            </button>
+          )}
+          {macro.video_url && !isAdmin && (
             <div className="text-cb-yellow bg-cb-yellow/10 border border-cb-yellow/20 p-1.5 rounded-md flex items-center gap-1">
               <Play size={12} className="fill-current" />
               <span className="text-[10px] font-bold tracking-wide uppercase">Video</span>
