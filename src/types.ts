@@ -10,6 +10,7 @@ export interface Macro {
   bounty_boost?: string;
   video_url?: string;
   macro_json: string;
+  notes?: string;
   comment_count: number;
   view_count: number;
   views?: string[];
