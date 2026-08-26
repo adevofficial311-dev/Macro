@@ -187,13 +187,13 @@ export function PublishMacro() {
           <div className="grid gap-4">
             <Input 
               label="Creator / Player Name *"
-              placeholder="Just type your Discord Username Twinalo"
+              placeholder="e.g. ViperX"
               value={formData.creator_name}
               onChange={e => setFormData({...formData, creator_name: e.target.value})}
             />
             <Input 
               label="Macro Title *"
-              placeholder="Whatever title. Nothing inappropriate"
+              placeholder="e.g. Dragon + Godhuman One Shot 100-0"
               value={formData.title}
               onChange={e => setFormData({...formData, title: e.target.value})}
             />
@@ -248,8 +248,8 @@ export function PublishMacro() {
               onChange={val => setFormData({...formData, macro_type: val})} 
             />
             <Input 
-              label="Bounty Boost"
-              placeholder="Add your Bounty / Bounty Boost"
+              label="Bounty Boost Tier"
+              placeholder="e.g. 500K+ / 1M+"
               value={formData.bounty_boost}
               onChange={e => setFormData({...formData, bounty_boost: e.target.value})}
             />
@@ -271,7 +271,7 @@ export function PublishMacro() {
           <div className="flex flex-col gap-1.5 w-full">
             <textarea
               className="w-full h-56 p-4 bg-cb-bg border border-cb-border rounded-xl text-xs text-cb-yellow font-mono focus:outline-none focus:border-cb-yellow focus:ring-1 focus:ring-cb-yellow/20 transition-all custom-scrollbar"
-              placeholder='Paste the Import Code From The CokeBoys Script'
+              placeholder='{\n  "name": "Combo1",\n  "actions": [\n    { "key": "Z", "delay": 200 },\n    { "key": "X", "delay": 150 }\n  ]\n}'
               value={formData.macro_json}
               onChange={e => setFormData({...formData, macro_json: e.target.value})}
             />
