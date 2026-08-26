@@ -26,7 +26,8 @@ export function PublishMacro() {
     macro_type: '',
     bounty_boost: '',
     video_url: '',
-    macro_json: ''
+    macro_json: '',
+    notes: ''
   });
 
   const handleReviewStep = () => {
@@ -146,6 +147,14 @@ export function PublishMacro() {
               {formData.macro_json}
             </pre>
           </div>
+          {formData.notes && (
+            <div>
+              <p className="text-xs text-cb-text-muted uppercase tracking-wider font-semibold mb-2">Creator Notes</p>
+              <p className="bg-cb-bg p-4 rounded-xl border border-cb-border text-sm text-white font-medium">
+                {formData.notes}
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="flex gap-4">
@@ -187,13 +196,13 @@ export function PublishMacro() {
           <div className="grid gap-4">
             <Input 
               label="Creator / Player Name *"
-              placeholder="Put Your / The Macro Creators Name"
+              placeholder="e.g. ViperX"
               value={formData.creator_name}
               onChange={e => setFormData({...formData, creator_name: e.target.value})}
             />
             <Input 
               label="Macro Title *"
-              placeholder="Just Name It Something Twinalo"
+              placeholder="e.g. Dragon + Godhuman One Shot 100-0"
               value={formData.title}
               onChange={e => setFormData({...formData, title: e.target.value})}
             />
@@ -271,9 +280,25 @@ export function PublishMacro() {
           <div className="flex flex-col gap-1.5 w-full">
             <textarea
               className="w-full h-56 p-4 bg-cb-bg border border-cb-border rounded-xl text-xs text-cb-yellow font-mono focus:outline-none focus:border-cb-yellow focus:ring-1 focus:ring-cb-yellow/20 transition-all custom-scrollbar"
-              placeholder='Paste The Import Code From CokeBoys'
+              placeholder='{\n  "name": "Combo1",\n  "actions": [\n    { "key": "Z", "delay": 200 },\n    { "key": "X", "delay": 150 }\n  ]\n}'
               value={formData.macro_json}
               onChange={e => setFormData({...formData, macro_json: e.target.value})}
+            />
+          </div>
+        </section>
+
+        {/* SECTION: NOTES */}
+        <section className="bg-cb-surface/80 border border-cb-border rounded-2xl p-6 shadow-md">
+          <h2 className="text-base font-display font-bold text-white mb-4 flex items-center gap-2 border-b border-cb-border pb-3">
+            <span className="w-6 h-6 rounded-full bg-cb-yellow/20 text-cb-yellow flex items-center justify-center text-xs font-mono font-bold">5</span>
+            <span>Important Notes (Optional)</span>
+          </h2>
+          <div className="flex flex-col gap-1.5 w-full">
+            <textarea
+              className="w-full h-32 p-4 bg-cb-bg border border-cb-border rounded-xl text-sm text-white placeholder-cb-text-muted focus:outline-none focus:border-cb-yellow focus:ring-1 focus:ring-cb-yellow/20 transition-all custom-scrollbar"
+              placeholder="e.g. Ensure you have high ping for this combo, wait for the fruit animation to finish..."
+              value={formData.notes}
+              onChange={e => setFormData({...formData, notes: e.target.value})}
             />
           </div>
         </section>

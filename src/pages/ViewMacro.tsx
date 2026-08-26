@@ -22,6 +22,8 @@ export function ViewMacro() {
   const [newComment, setNewComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editMacro, setEditMacro] = useState<Macro | null>(null);
 
   useEffect(() => {
     return () => {
@@ -143,6 +145,21 @@ export function ViewMacro() {
       }
   };
 
+  const handleUpdateMacro = async () => {
+    if (!editMacro || !id) return;
+    try {
+      await updateDoc(doc(db, 'macros', id), {
+        title: editMacro.title,
+        notes: editMacro.notes,
+        macro_json: editMacro.macro_json
+      });
+      setMacro(editMacro);
+      setIsEditing(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const getEmbedUrl = (url: string) => {
     try {
       const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]+)/);
@@ -210,8 +227,20 @@ export function ViewMacro() {
         <div className="lg:col-span-7 flex flex-col gap-6">
           <div className="bg-cb-surface/80 border border-cb-border rounded-2xl p-6 shadow-xl">
             
-            {/* Header info */}
+          {/* Header info */}
             <div className="flex flex-wrap items-center gap-2 mb-3">
+              {isAdmin && !isEditing && (
+                <Button variant="secondary" className="h-7 text-xs px-2" onClick={() => {
+                  setEditMacro(macro);
+                  setIsEditing(true);
+                }}>Edit Macro</Button>
+              )}
+              {isEditing && (
+                <div className="flex gap-2">
+                    <Button variant="primary" className="h-7 text-xs px-2" onClick={handleUpdateMacro}>Save Changes</Button>
+                    <Button variant="secondary" className="h-7 text-xs px-2" onClick={() => setIsEditing(false)}>Cancel</Button>
+                </div>
+              )}
               <span className={`text-xs px-2.5 py-0.5 rounded font-bold uppercase tracking-wider border ${
                 macro.macro_type.toLowerCase().includes('one shot')
                   ? 'bg-cb-red/20 text-cb-red border-cb-red/30'
@@ -231,7 +260,9 @@ export function ViewMacro() {
             </div>
 
             <h1 className="text-xl sm:text-3xl md:text-4xl font-display font-black text-white tracking-tight leading-tight mb-3 break-words">
-              {macro.title}
+              {isEditing ? (
+                <Input value={editMacro?.title} onChange={(e) => setEditMacro(prev => prev ? {...prev, title: e.target.value} : null)} />
+              ) : macro.title}
             </h1>
 
             <div className="flex items-center gap-2 text-sm mb-6">
@@ -260,6 +291,29 @@ export function ViewMacro() {
                 ))}
               </div>
             </div>
+            
+            {macro.notes && !isEditing && (
+              <div className="mt-6">
+                <div className="text-xs font-bold text-cb-text-muted uppercase tracking-wider mb-2.5">
+                  Creator Notes
+                </div>
+                <div className="bg-cb-bg p-4 rounded-xl border border-cb-border text-sm text-white font-medium">
+                  {macro.notes}
+                </div>
+              </div>
+            )}
+            {isEditing && (
+              <div className="mt-6">
+                <div className="text-xs font-bold text-cb-text-muted uppercase tracking-wider mb-2.5">
+                  Creator Notes
+                </div>
+                <textarea
+                  className="w-full p-3 bg-cb-bg border border-cb-border rounded-lg text-sm text-white"
+                  value={editMacro?.notes}
+                  onChange={(e) => setEditMacro(prev => prev ? {...prev, notes: e.target.value} : null)}
+                />
+              </div>
+            )}
           </div>
 
           {/* Video Showcase */}
@@ -329,7 +383,13 @@ export function ViewMacro() {
 
             <div className="flex-1 bg-cb-bg p-4 overflow-auto custom-scrollbar">
               <pre className="text-xs text-cb-yellow font-mono leading-relaxed whitespace-pre-wrap">
-                {macro.macro_json}
+                {isEditing ? (
+                  <textarea 
+                    className="w-full h-full bg-transparent text-cb-yellow border-none focus:ring-0 p-0"
+                    value={editMacro?.macro_json}
+                    onChange={(e) => setEditMacro(prev => prev ? {...prev, macro_json: e.target.value} : null)}
+                  />
+                ) : macro.macro_json}
               </pre>
             </div>
 
