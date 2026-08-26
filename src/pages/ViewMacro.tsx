@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router';
-import { doc, getDoc, updateDoc, increment, collection, addDoc, query, where, orderBy, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, increment, collection, addDoc, query, where, orderBy, onSnapshot, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Macro, Comment } from '../types';
 import { Button } from '../components/ui/Button';
@@ -8,6 +8,7 @@ import { Input } from '../components/ui/Input';
 import { useAuthProfile } from '../context/AuthProfileContext';
 import { ProfileModal } from '../components/ui/ProfileModal';
 import { isYouTubeUrl, getYouTubeEmbedUrl, getLocalVideo } from '../lib/videoStorage';
+import { Copy, Check, ChevronLeft, Flame, Eye, MessageSquare, Play, Send, ShieldCheck, Heart } from 'lucide-react';
 
 export function ViewMacro() {
   const { id } = useParams();
@@ -32,6 +33,18 @@ export function ViewMacro() {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const data = { id: docSnap.id, ...docSnap.data() } as Macro;
+          const userId = profile.userId;
+          
+          // Track unique views
+          if (!data.views?.includes(userId)) {
+              if (!userId) return; // Safety check
+              await updateDoc(docRef, {
+                views: arrayUnion(userId),
+                view_count: increment(1)
+              });
+              data.views = [...(data.views || []), userId];
+              data.view_count += 1;
+          }
           setMacro(data);
           
           // Resolve video URL if needed (e.g. from IndexedDB)
@@ -46,9 +59,6 @@ export function ViewMacro() {
               setResolvedVideoUrl(data.video_url);
             }
           }
-
-          // Increment views
-          await updateDoc(docRef, { view_count: increment(1) });
         }
       } catch (err) {
         console.error(err);
@@ -101,6 +111,22 @@ export function ViewMacro() {
     }
   };
 
+  const handleLike = async () => {
+      if (!macro || !id) return;
+      const docRef = doc(db, 'macros', id);
+      const userId = profile.userId;
+      const isLiked = macro.likes?.includes(userId);
+      
+      if (isLiked) {
+          await updateDoc(docRef, { likes: arrayRemove(userId) });
+          setMacro(prev => prev ? {...prev, likes: prev.likes?.filter(uid => uid !== userId)} : null);
+      } else {
+          if (!userId) return; // Safety check
+          await updateDoc(docRef, { likes: arrayUnion(userId) });
+          setMacro(prev => prev ? {...prev, likes: [...(prev.likes || []), userId]} : null);
+      }
+  };
+
   const getEmbedUrl = (url: string) => {
     try {
       const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]+)/);
@@ -151,6 +177,10 @@ export function ViewMacro() {
             <Eye size={14} />
             <span>{macro.view_count || 1} Views</span>
           </div>
+          <button onClick={handleLike} className={`flex items-center gap-1.5 hover:text-cb-yellow transition-colors ${macro.likes?.includes(profile.userId) ? 'text-cb-yellow' : ''}`}>
+            <Heart size={14} fill={macro.likes?.includes(profile.userId) ? "currentColor" : "none"} />
+            <span>{macro.likes?.length || 0} Likes</span>
+          </button>
           <div className="flex items-center gap-1.5">
             <MessageSquare size={14} />
             <span>{macro.comment_count || comments.length} Comments</span>
