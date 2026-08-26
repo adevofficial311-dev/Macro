@@ -5,11 +5,13 @@ import { db } from '../lib/firebase';
 import { Macro, Comment } from '../types';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { Copy, Check, ChevronLeft, Flame, Eye, MessageSquare, Play, Send, ShieldCheck, Film, Download } from 'lucide-react';
+import { useAuthProfile } from '../context/AuthProfileContext';
+import { ProfileModal } from '../components/ui/ProfileModal';
 import { isYouTubeUrl, getYouTubeEmbedUrl, getLocalVideo } from '../lib/videoStorage';
 
 export function ViewMacro() {
   const { id } = useParams();
+  const { profile, isAdmin } = useAuthProfile();
   const [macro, setMacro] = useState<Macro | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -17,8 +19,8 @@ export function ViewMacro() {
   const [resolvedVideoUrl, setResolvedVideoUrl] = useState<string | null>(null);
   
   const [newComment, setNewComment] = useState('');
-  const [commenterName, setCommenterName] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -74,13 +76,18 @@ export function ViewMacro() {
 
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newComment.trim() || !commenterName.trim() || !id) return;
+    if (!newComment.trim() || !id) return;
+    if (profile.username === 'Gamer') {
+      setProfileOpen(true);
+      return;
+    }
 
     setSubmittingComment(true);
     try {
       await addDoc(collection(db, 'comments'), {
         macro_id: id,
-        creator_name: commenterName.trim(),
+        creator_name: profile.username,
+        creator_avatar: profile.avatar,
         content: newComment.trim(),
         created_at: Date.now()
       });
@@ -294,32 +301,37 @@ export function ViewMacro() {
         </div>
         
         {/* Comment Form */}
-        <form onSubmit={handleAddComment} className="bg-cb-surface/80 border border-cb-border rounded-2xl p-5 mb-8 shadow-lg">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-            <Input 
-              placeholder="Your Player Name..."
-              value={commenterName}
-              onChange={(e) => setCommenterName(e.target.value)}
+        {profile.username === 'Gamer' ? (
+          <div className="bg-cb-surface/80 border border-cb-border rounded-2xl p-5 mb-8 shadow-lg text-center">
+            <p className="text-cb-text-muted mb-4">Please create your profile to post comments.</p>
+            <Button onClick={() => setProfileOpen(true)} variant="primary">Create Profile</Button>
+          </div>
+        ) : (
+          <form onSubmit={handleAddComment} className="bg-cb-surface/80 border border-cb-border rounded-2xl p-5 mb-8 shadow-lg">
+            <div className="flex items-center gap-3 mb-3">
+                <img src={profile.avatar} className="w-10 h-10 rounded-full" />
+                <span className="font-bold text-white">@{profile.username}</span>
+            </div>
+            <textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Share feedback, suggested delays, or keybind optimizations..."
+              className="w-full h-24 p-3.5 bg-cb-bg border border-cb-border rounded-lg text-sm text-white placeholder-cb-text-muted focus:outline-none focus:border-cb-yellow focus:ring-1 focus:ring-cb-yellow/20 resize-none mb-3 custom-scrollbar"
             />
-          </div>
-          <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Share feedback, suggested delays, or keybind optimizations..."
-            className="w-full h-24 p-3.5 bg-cb-bg border border-cb-border rounded-lg text-sm text-white placeholder-cb-text-muted focus:outline-none focus:border-cb-yellow focus:ring-1 focus:ring-cb-yellow/20 resize-none mb-3 custom-scrollbar"
-          />
-          <div className="flex justify-end">
-            <Button 
-              variant="primary" 
-              type="submit" 
-              disabled={submittingComment || !newComment.trim() || !commenterName.trim()}
-              className="gap-2 font-bold"
-            >
-              <Send size={14} />
-              <span>{submittingComment ? 'Posting...' : 'Post Comment'}</span>
-            </Button>
-          </div>
-        </form>
+            <div className="flex justify-end">
+              <Button 
+                variant="primary" 
+                type="submit" 
+                disabled={submittingComment || !newComment.trim()}
+                className="gap-2 font-bold"
+              >
+                <Send size={14} />
+                <span>{submittingComment ? 'Posting...' : 'Post Comment'}</span>
+              </Button>
+            </div>
+          </form>
+        )}
+        <ProfileModal isOpen={profileOpen} onClose={() => setProfileOpen(false)} />
 
         {/* Comment List */}
         <div className="flex flex-col gap-3">
@@ -330,13 +342,14 @@ export function ViewMacro() {
           ) : (
             comments.map((comment) => (
               <div key={comment.id} className="bg-cb-surface/70 border border-cb-border rounded-xl p-4 transition-colors hover:border-cb-border-hover">
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-3 mb-2">
+                  <img src={comment.creator_avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'} className="w-8 h-8 rounded-full" />
                   <span className="font-bold text-white text-sm font-mono text-cb-yellow">@{comment.creator_name}</span>
-                  <span className="text-[11px] text-cb-text-muted">
+                  <span className="text-[11px] text-cb-text-muted ml-auto">
                     {new Date(comment.created_at).toLocaleDateString()}
                   </span>
                 </div>
-                <p className="text-sm text-cb-text leading-relaxed">
+                <p className="text-sm text-cb-text leading-relaxed ml-11">
                   {comment.content}
                 </p>
               </div>
