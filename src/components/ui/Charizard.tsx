@@ -591,15 +591,17 @@ export function Charizard() {
           </AnimatePresence>
 
           
-          {/* --- MEWTWO SEQUENCE --- */}
+          {/* --- MEWTWO SEQUENCE ---
+              Kept intentionally viewport-contained: no giant negative offsets,
+              no off-screen character staging, and smaller impact effects. */}
           <AnimatePresence>
             {(mode === 'secret_mewtwo' || mode === 'defeated_exploded') && (
               <>
                 {/* Pikachu appears first */}
                 {mode === 'secret_mewtwo' && (
                   <motion.div 
-                    initial={{ x: 800, y: -100, scale: 1.5 }}
-                    animate={{ x: 180, y: -60 }}
+                    initial={{ x: 260, y: -40, scale: 1.15, opacity: 0 }}
+                    animate={{ x: 0, y: -70, scale: 1, opacity: 1 }}
                     exit={{ opacity: 0, y: 1000 }}
                     transition={{ duration: 0.6, type: 'spring', bounce: 0.3 }}
                     className="absolute z-50 flex items-center justify-center pointer-events-none drop-shadow-xl will-change-transform"
@@ -617,7 +619,7 @@ export function Charizard() {
                     transition={{ duration: 0.3, ease: "easeIn" }}
                     className="absolute z-50 flex items-center justify-center pointer-events-none drop-shadow-2xl will-change-transform"
                   >
-                    <img src={MEWTWO_SPRITE} alt="Mewtwo" className="w-48 h-48 drop-shadow-[0_0_25px_#9C27B0]" />
+                    <img src={MEWTWO_SPRITE} alt="Mewtwo" className="w-36 h-36 sm:w-44 sm:h-44 drop-shadow-[0_0_25px_#9C27B0]" />
                     
                     {/* Psychic Blast Ring */}
                     <motion.div
@@ -639,7 +641,7 @@ export function Charizard() {
                     transition={{ duration: 0.7, delay: 0.9, type: "spring", bounce: 0.4 }}
                     className="absolute z-50 flex items-center justify-center pointer-events-none drop-shadow-2xl left-[-200px] will-change-transform"
                   >
-                    <img src={LUCARIO_SPRITE} alt="Lucario" className="w-40 h-40 drop-shadow-[0_0_25px_#00E5FF]" />
+                    <img src={LUCARIO_SPRITE} alt="Lucario" className="w-28 h-28 sm:w-36 sm:h-36 drop-shadow-[0_0_25px_#00E5FF]" />
                     
                     {/* Aura Sphere Energy Core */}
                     <motion.div
@@ -648,8 +650,8 @@ export function Charizard() {
                       transition={{ duration: 1.2, delay: 1.3, times: [0, 0.2, 0.7, 1], ease: "easeIn" }}
                       className="absolute rounded-full pointer-events-none z-[9999] will-change-transform"
                       style={{
-                        width: 90,
-                        height: 90,
+                        width: 70,
+                        height: 70,
                         background: 'radial-gradient(circle, #FFFFFF 0%, #00E5FF 50%, #2979FF 80%, transparent 100%)',
                         boxShadow: '0 0 35px #00E5FF'
                       }}
@@ -662,7 +664,7 @@ export function Charizard() {
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: [0, 0, 1, 0] }}
-                    transition={{ duration: 1.8, delay: 1.4, times: [0, 0.1, 0.4, 1] }}
+                    transition={{ duration: 1.1, delay: 1.4, times: [0, 0.18, 0.45, 1] }}
                     className="fixed inset-0 bg-white z-[9998] pointer-events-none will-change-opacity"
                   />
                 )}
