@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export interface UserProfile {
+  userId: string;
   username: string;
   avatar: string;
   rank: 'NOVICE' | 'VERIFIED' | 'ELITE' | 'COKEBOY';
@@ -16,6 +17,7 @@ interface AuthProfileContextType {
 }
 
 const DEFAULT_PROFILE: UserProfile = {
+  userId: crypto.randomUUID(),
   username: 'Gamer',
   avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
   rank: 'NOVICE',
