@@ -16,12 +16,12 @@ export function Enter() {
         </p>
       </div>
 
-      <div id="cinematic-video-container" className="w-full max-w-4xl aspect-video bg-cb-surface rounded-2xl border border-cb-border overflow-hidden shadow-2xl mb-8 relative group">
+      <div id="video-showcase-guide" className="w-full max-w-4xl aspect-video bg-cb-surface rounded-2xl border border-cb-border overflow-hidden shadow-2xl mb-8 relative group">
         <iframe 
           width="100%" 
           height="100%" 
           src="https://www.youtube.com/embed/VnXCxwjc_o0?autoplay=1&mute=1&loop=1" 
-          title="CokeBoys Client Showcase" 
+          title="CokeBoys Client Macro Showcase" 
           frameBorder="0" 
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
           allowFullScreen
