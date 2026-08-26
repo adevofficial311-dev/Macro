@@ -35,15 +35,20 @@ export function ViewMacro() {
           const data = { id: docSnap.id, ...docSnap.data() } as Macro;
           const userId = profile.userId;
           
+          // Ensure arrays exist
+          if (!data.views) data.views = [];
+          if (!data.likes) data.likes = [];
+          
           // Track unique views
-          if (!data.views?.includes(userId)) {
-              if (!userId) return; // Safety check
-              await updateDoc(docRef, {
-                views: arrayUnion(userId),
-                view_count: increment(1)
-              });
-              data.views = [...(data.views || []), userId];
-              data.view_count += 1;
+          if (!data.views.includes(userId)) {
+              if (userId) {
+                await updateDoc(docRef, {
+                  views: arrayUnion(userId),
+                  view_count: increment(1)
+                });
+                data.views = [...data.views, userId];
+                data.view_count += 1;
+              }
           }
           setMacro(data);
           
@@ -115,15 +120,18 @@ export function ViewMacro() {
       if (!macro || !id) return;
       const docRef = doc(db, 'macros', id);
       const userId = profile.userId;
-      const isLiked = macro.likes?.includes(userId);
+      if (!userId) return; // User must have a profile
+
+      // Ensure likes array exists locally
+      const currentLikes = macro.likes || [];
+      const isLiked = currentLikes.includes(userId);
       
       if (isLiked) {
           await updateDoc(docRef, { likes: arrayRemove(userId) });
-          setMacro(prev => prev ? {...prev, likes: prev.likes?.filter(uid => uid !== userId)} : null);
+          setMacro(prev => prev ? {...prev, likes: currentLikes.filter(uid => uid !== userId)} : null);
       } else {
-          if (!userId) return; // Safety check
           await updateDoc(docRef, { likes: arrayUnion(userId) });
-          setMacro(prev => prev ? {...prev, likes: [...(prev.likes || []), userId]} : null);
+          setMacro(prev => prev ? {...prev, likes: [...currentLikes, userId]} : null);
       }
   };
 
