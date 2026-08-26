@@ -248,8 +248,8 @@ export function PublishMacro() {
               onChange={val => setFormData({...formData, macro_type: val})} 
             />
             <Input 
-              label="Bounty Boost Tier"
-              placeholder="e.g. 500K+ / 1M+"
+              label="Bounty Boost"
+              placeholder="Add your Bounty / Bounty Boost"
               value={formData.bounty_boost}
               onChange={e => setFormData({...formData, bounty_boost: e.target.value})}
             />
