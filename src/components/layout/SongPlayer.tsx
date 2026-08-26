@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Play, Pause, Volume2, VolumeX, Music } from 'lucide-react';
+import { motion } from 'motion/react';
 
 const SONG_URL = "https://archive.org/download/GymnopedieNo.1/Gymnopedie%20No.1.mp3";
 const SONG_TITLE = "Gymnopédie No. 1";
@@ -52,7 +53,7 @@ export function SongPlayer() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3 group">
+    <motion.div drag dragMomentum={false} className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3 group cursor-move">
       <audio 
         ref={audioRef} 
         src={SONG_URL} 
@@ -107,6 +108,6 @@ export function SongPlayer() {
           {isPlaying ? <Pause size={16} className="fill-current" /> : <Play size={16} className="ml-0.5 fill-current" />}
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }
