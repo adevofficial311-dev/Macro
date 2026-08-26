@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Macro } from '../types';
@@ -34,6 +34,58 @@ const TYPE_OPTIONS = [
   { value: 'one shot', label: 'One Shot' },
   { value: 'infinite combo', label: 'Infinite Combo' },
 ];
+
+const FilterContent = memo(({
+  search, setSearch,
+  fruitFilter, setFruitFilter,
+  swordFilter, setSwordFilter,
+  meleeFilter, setMeleeFilter,
+  gunFilter, setGunFilter,
+  typeFilter, setTypeFilter,
+  activeFilterCount,
+  resetFilters,
+  setMobileFilterOpen
+}: any) => (
+  <div className="flex flex-col gap-5 bg-cb-surface/80 border border-cb-border rounded-2xl p-5 shadow-lg">
+    <div className="flex items-center justify-between border-b border-cb-border/80 pb-3">
+      <div className="flex items-center gap-2">
+        <SlidersHorizontal size={18} className="text-cb-yellow" />
+        <h3 className="text-base font-bold text-white font-display">Filter Combos</h3>
+      </div>
+      {activeFilterCount > 0 && (
+        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-cb-red text-white">
+          {activeFilterCount} Active
+        </span>
+      )}
+    </div>
+
+    <Input 
+      placeholder="Search combo by title..." 
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+    />
+    
+    <div className="flex flex-col gap-3.5">
+      <SearchableSelect label="Macro Type" options={TYPE_OPTIONS} value={typeFilter} onChange={setTypeFilter} />
+      <SearchableSelect label="Fruit" options={FILTER_FRUIT_OPTIONS} value={fruitFilter} onChange={setFruitFilter} />
+      <SearchableSelect label="Sword" options={FILTER_SWORD_OPTIONS} value={swordFilter} onChange={setSwordFilter} />
+      <SearchableSelect label="Melee" options={FILTER_MELEE_OPTIONS} value={meleeFilter} onChange={setMeleeFilter} />
+      <SearchableSelect label="Gun" options={FILTER_GUN_OPTIONS} value={gunFilter} onChange={setGunFilter} />
+    </div>
+
+    <div className="pt-3 border-t border-cb-border/80 flex flex-col gap-2">
+      <Button variant="primary" fullWidth onClick={() => setMobileFilterOpen(false)} className="md:hidden">
+        Apply Filters
+      </Button>
+      {activeFilterCount > 0 && (
+        <Button variant="ghost" fullWidth onClick={resetFilters} className="text-cb-red hover:text-cb-red-hover hover:bg-cb-red/10 gap-1.5">
+          <RotateCcw size={14} />
+          <span>Reset All Filters</span>
+        </Button>
+      )}
+    </div>
+  </div>
+));
 
 export function Macros() {
   const [macros, setMacros] = useState<Macro[]>([]);
@@ -91,47 +143,7 @@ export function Macros() {
 
   const activeFilterCount = [fruitFilter, swordFilter, meleeFilter, gunFilter, typeFilter].filter(f => f !== 'all').length + (search ? 1 : 0);
 
-  const FilterContent = () => (
-    <div className="flex flex-col gap-5 bg-cb-surface/80 border border-cb-border rounded-2xl p-5 shadow-lg">
-      <div className="flex items-center justify-between border-b border-cb-border/80 pb-3">
-        <div className="flex items-center gap-2">
-          <SlidersHorizontal size={18} className="text-cb-yellow" />
-          <h3 className="text-base font-bold text-white font-display">Filter Combos</h3>
-        </div>
-        {activeFilterCount > 0 && (
-          <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-cb-red text-white">
-            {activeFilterCount} Active
-          </span>
-        )}
-      </div>
 
-      <Input 
-        placeholder="Search combo by title..." 
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
-      
-      <div className="flex flex-col gap-3.5">
-        <SearchableSelect label="Macro Type" options={TYPE_OPTIONS} value={typeFilter} onChange={setTypeFilter} />
-        <SearchableSelect label="Fruit" options={FILTER_FRUIT_OPTIONS} value={fruitFilter} onChange={setFruitFilter} />
-        <SearchableSelect label="Sword" options={FILTER_SWORD_OPTIONS} value={swordFilter} onChange={setSwordFilter} />
-        <SearchableSelect label="Melee" options={FILTER_MELEE_OPTIONS} value={meleeFilter} onChange={setMeleeFilter} />
-        <SearchableSelect label="Gun" options={FILTER_GUN_OPTIONS} value={gunFilter} onChange={setGunFilter} />
-      </div>
-
-      <div className="pt-3 border-t border-cb-border/80 flex flex-col gap-2">
-        <Button variant="primary" fullWidth onClick={() => setMobileFilterOpen(false)} className="md:hidden">
-          Apply Filters
-        </Button>
-        {activeFilterCount > 0 && (
-          <Button variant="ghost" fullWidth onClick={resetFilters} className="text-cb-red hover:text-cb-red-hover hover:bg-cb-red/10 gap-1.5">
-            <RotateCcw size={14} />
-            <span>Reset All Filters</span>
-          </Button>
-        )}
-      </div>
-    </div>
-  );
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 flex flex-col md:flex-row gap-8">
@@ -139,7 +151,17 @@ export function Macros() {
       {/* Desktop Sidebar */}
       <aside className="hidden md:block w-72 shrink-0">
         <div className="sticky top-[96px]">
-          <FilterContent />
+          <FilterContent 
+            search={search} setSearch={setSearch}
+            fruitFilter={fruitFilter} setFruitFilter={setFruitFilter}
+            swordFilter={swordFilter} setSwordFilter={setSwordFilter}
+            meleeFilter={meleeFilter} setMeleeFilter={setMeleeFilter}
+            gunFilter={gunFilter} setGunFilter={setGunFilter}
+            typeFilter={typeFilter} setTypeFilter={setTypeFilter}
+            activeFilterCount={activeFilterCount}
+            resetFilters={resetFilters}
+            setMobileFilterOpen={setMobileFilterOpen}
+          />
         </div>
       </aside>
 
@@ -154,7 +176,17 @@ export function Macros() {
             >
               <X size={24} />
             </button>
-            <FilterContent />
+            <FilterContent 
+              search={search} setSearch={setSearch}
+              fruitFilter={fruitFilter} setFruitFilter={setFruitFilter}
+              swordFilter={swordFilter} setSwordFilter={setSwordFilter}
+              meleeFilter={meleeFilter} setMeleeFilter={setMeleeFilter}
+              gunFilter={gunFilter} setGunFilter={setGunFilter}
+              typeFilter={typeFilter} setTypeFilter={setTypeFilter}
+              activeFilterCount={activeFilterCount}
+              resetFilters={resetFilters}
+              setMobileFilterOpen={setMobileFilterOpen}
+            />
           </div>
         </div>
       )}
