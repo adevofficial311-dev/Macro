@@ -5,6 +5,9 @@ const CHARIZARD_SPRITE = "https://play.pokemonshowdown.com/sprites/ani/charizard
 const CHARIZARD_MEGA_SPRITE = "https://play.pokemonshowdown.com/sprites/ani/charizard-megax.gif"; 
 const PIKACHU_SPRITE = "https://play.pokemonshowdown.com/sprites/ani/pikachu.gif";
 const BLASTOISE_SPRITE = "https://play.pokemonshowdown.com/sprites/ani/blastoise.gif";
+const MEWTWO_SPRITE = "https://play.pokemonshowdown.com/sprites/ani/mewtwo.gif";
+const LUCARIO_SPRITE = "https://play.pokemonshowdown.com/sprites/ani/lucario.gif";
+const RAYQUAZA_SPRITE = "https://play.pokemonshowdown.com/sprites/ani/rayquaza-mega.gif";
 
 type CharizardMode = 
   | 'normal' | 'spitting_fire' | 'sleeping' | 'waking' 
@@ -38,6 +41,9 @@ export function Charizard() {
   const audioMegaRef = useRef<HTMLAudioElement | null>(null);
   const audioPikachuRef = useRef<HTMLAudioElement | null>(null);
   const audioBlastoiseRef = useRef<HTMLAudioElement | null>(null);
+  const audioMewtwoRef = useRef<HTMLAudioElement | null>(null);
+  const audioLucarioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRayquazaRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     audioNormalRef.current = new Audio('https://play.pokemonshowdown.com/audio/cries/charizard.mp3');
@@ -48,6 +54,12 @@ export function Charizard() {
     audioPikachuRef.current.volume = 0.9;
     audioBlastoiseRef.current = new Audio('https://play.pokemonshowdown.com/audio/cries/blastoise.mp3');
     audioBlastoiseRef.current.volume = 1.0;
+    audioMewtwoRef.current = new Audio('https://play.pokemonshowdown.com/audio/cries/mewtwo.mp3');
+    audioMewtwoRef.current.volume = 1.0;
+    audioLucarioRef.current = new Audio('https://play.pokemonshowdown.com/audio/cries/lucario.mp3');
+    audioLucarioRef.current.volume = 1.0;
+    audioRayquazaRef.current = new Audio('https://play.pokemonshowdown.com/audio/cries/rayquaza-mega.mp3');
+    audioRayquazaRef.current.volume = 1.0;
     
     // Get tired after 12 seconds
     const timer = setTimeout(() => {
@@ -125,6 +137,10 @@ export function Charizard() {
   }, []);
 
   const triggerScreenShake = (intensity: number, duration: number) => {
+    // Clamp intensity to prevent heavy browser reflow and frame drops
+    const safeIntensity = Math.min(intensity, 18);
+    const root = document.getElementById('root') || document.body;
+
     if (!document.getElementById('shake-style')) {
       const style = document.createElement('style');
       style.id = 'shake-style';
@@ -134,12 +150,16 @@ export function Charizard() {
     style.innerHTML = `
       @keyframes charizard-shake {
         0%, 100% { transform: translate3d(0, 0, 0); }
-        10%, 30%, 50%, 70%, 90% { transform: translate3d(-${intensity}px, ${intensity/2}px, 0) rotate(-1deg); }
-        20%, 40%, 60%, 80% { transform: translate3d(${intensity}px, -${intensity/2}px, 0) rotate(1deg); }
+        10%, 30%, 50%, 70%, 90% { transform: translate3d(-${safeIntensity}px, ${safeIntensity * 0.5}px, 0); }
+        20%, 40%, 60%, 80% { transform: translate3d(${safeIntensity}px, -${safeIntensity * 0.5}px, 0); }
       }
     `;
-    document.body.style.animation = `charizard-shake ${duration}ms cubic-bezier(.36,.07,.19,.97) both`;
-    setTimeout(() => { document.body.style.animation = ''; }, duration);
+    root.style.willChange = 'transform';
+    root.style.animation = `charizard-shake ${duration}ms cubic-bezier(.36,.07,.19,.97) both`;
+    setTimeout(() => {
+      root.style.animation = '';
+      root.style.willChange = 'auto';
+    }, duration);
   };
 
   const triggerNuke = () => {
@@ -210,9 +230,24 @@ export function Charizard() {
         triggerScreenShake(10, 1000);
         
         setTimeout(() => {
-          // Choose 1 of 2 Random Secret Endings!
+          // Choose 1 of 4 Random Secret Endings (One Super Rare!)
           const r = Math.random();
-          if (r < 0.5) {
+          if (r < 0.05) { // 5% SUPER RARE: MEGA RAYQUAZA
+            setMode('secret_rayquaza');
+            if (audioRayquazaRef.current) {
+              audioRayquazaRef.current.currentTime = 0;
+              audioRayquazaRef.current.play().catch(() => {});
+            }
+            setTimeout(() => {
+              triggerScreenShake(150, 4000); // Earth-shattering screen shake
+              setMode('defeated_vaporized');
+              setTimeout(() => {
+                setMode('hidden');
+                setTimeout(() => resetCharizard(), 1000);
+              }, 4000);
+            }, 2000);
+
+          } else if (r < 0.36) {
             // PIKACHU ENDING
             setMode('secret_pikachu');
             if (audioPikachuRef.current) {
@@ -226,6 +261,35 @@ export function Charizard() {
                 setMode('hidden');
                 setTimeout(() => resetCharizard(), 500);
               }, 1200);
+            }, 1200);
+
+          } else if (r < 0.66) {
+            // MEWTWO & LUCARIO ENDING - S-TIER CINEMATIC WEB DESTRUCTION
+            setMode('secret_mewtwo');
+            if (audioPikachuRef.current) {
+              audioPikachuRef.current.currentTime = 0;
+              audioPikachuRef.current.play().catch(() => {});
+            }
+            setTimeout(() => {
+              if (audioMewtwoRef.current) {
+                audioMewtwoRef.current.currentTime = 0;
+                audioMewtwoRef.current.play().catch(() => {});
+              }
+              triggerScreenShake(40, 2500); // Powerful psychic shake
+              setMode('defeated_exploded');
+              
+              setTimeout(() => {
+                if (audioLucarioRef.current) {
+                  audioLucarioRef.current.currentTime = 0;
+                  audioLucarioRef.current.play().catch(() => {});
+                }
+                triggerScreenShake(70, 2000); // Aura sphere impact shake
+              }, 900); // Lucario strikes mid-explosion
+
+              // After the total psychic/aura explosion, the web is destroyed!
+              setTimeout(() => {
+                setMode('destroyed');
+              }, 2800);
             }, 1200);
 
           } else {
@@ -374,7 +438,7 @@ export function Charizard() {
           width: isMega ? 100 : 80,
           height: isMega ? 100 : 80,
           opacity: ['destroyed', 'hidden'].includes(mode) ? 0 : 1,
-          pointerEvents: ['destroyed', 'hidden', 'defeated_flying', 'defeated_washed', 'secret_blastoise', 'secret_pikachu'].includes(mode) ? 'none' : 'auto',
+          pointerEvents: ['destroyed', 'hidden', 'defeated_flying', 'defeated_washed', 'defeated_exploded', 'secret_mewtwo', 'secret_rayquaza', 'defeated_vaporized', 'secret_blastoise', 'secret_pikachu'].includes(mode) ? 'none' : 'auto',
           transition: 'opacity 0.2s'
         }}
         onClick={handleClick}
@@ -413,6 +477,8 @@ export function Charizard() {
               : mode === 'waking' ? { y: [0, -2, 2, 0], x: 0, scale: 1, rotate: 0, opacity: 1, filter: "brightness(1)" }
               : mode === 'defeated_flying' ? { x: -1000, y: -500, rotate: -720, scale: 0, opacity: 0 }
               : mode === 'defeated_washed' ? { x: 2500, y: -100, rotate: 2160, opacity: 0, scale: 0.2 }
+              : mode === 'defeated_exploded' ? { x: [0, -100, -500], y: [0, 500, 1500], rotate: [0, 90, 720], scale: [1, 0.5, 0], opacity: 0, filter: "brightness(5)" }
+              : mode === 'defeated_vaporized' ? { scale: 0, opacity: 0, rotate: 1080, filter: "brightness(20) contrast(10)", transition: { duration: 0.2 } }
               : { x: 0, y: 0, scale: 1, rotate: 0, opacity: 1, filter: "brightness(1)" }
             }
             transition={{ 
@@ -420,6 +486,7 @@ export function Charizard() {
                         : mode === 'waking' ? 0.1 
                         : mode === 'defeated_flying' ? 1
                         : mode === 'defeated_washed' ? 1.5
+                        : mode === 'defeated_exploded' ? 1.2
                         : 0.3, 
               times: mode === 'nuking' ? [0, 0.5, 0.8, 1] : undefined,
               repeat: mode === 'waking' ? Infinity : mode === 'spitting_fire' ? (isMega ? 5 : 4) : 0 
@@ -450,6 +517,130 @@ export function Charizard() {
             )}
           </AnimatePresence>
 
+          
+          {/* --- MEWTWO SEQUENCE --- */}
+          <AnimatePresence>
+            {(mode === 'secret_mewtwo' || mode === 'defeated_exploded') && (
+              <>
+                {/* Pikachu appears first */}
+                {mode === 'secret_mewtwo' && (
+                  <motion.div 
+                    initial={{ x: 800, y: -100, scale: 1.5 }}
+                    animate={{ x: 180, y: -60 }}
+                    exit={{ opacity: 0, y: 1000 }}
+                    transition={{ duration: 0.6, type: 'spring', bounce: 0.3 }}
+                    className="absolute z-50 flex items-center justify-center pointer-events-none drop-shadow-xl will-change-transform"
+                  >
+                    <img src={PIKACHU_SPRITE} alt="Pikachu" className="w-32 h-32 drop-shadow-[0_0_20px_#FFE81F]" />
+                  </motion.div>
+                )}
+                
+                {/* Mewtwo Drops In */}
+                {mode === 'defeated_exploded' && (
+                  <motion.div 
+                    initial={{ y: -1000, x: 100, scale: 2 }}
+                    animate={{ y: -80, x: 100 }}
+                    exit={{ opacity: 0, scale: 0 }}
+                    transition={{ duration: 0.3, ease: "easeIn" }}
+                    className="absolute z-50 flex items-center justify-center pointer-events-none drop-shadow-2xl will-change-transform"
+                  >
+                    <img src={MEWTWO_SPRITE} alt="Mewtwo" className="w-48 h-48 drop-shadow-[0_0_25px_#9C27B0]" />
+                    
+                    {/* Psychic Blast Ring */}
+                    <motion.div
+                      initial={{ scale: 0, opacity: 1 }}
+                      animate={{ scale: [0, 6, 12], opacity: [1, 0.8, 0] }}
+                      transition={{ duration: 1.5, times: [0, 0.3, 1], ease: "easeOut" }}
+                      className="absolute z-40 rounded-full border-4 border-[#E040FB] pointer-events-none will-change-transform"
+                      style={{ width: 140, height: 140, background: 'radial-gradient(circle, rgba(224,64,251,0.25) 0%, rgba(156,39,176,0.1) 60%, transparent 80%)' }}
+                    />
+                  </motion.div>
+                )}
+
+                {/* Lucario Appears in the Blast */}
+                {mode === 'defeated_exploded' && (
+                  <motion.div 
+                    initial={{ scale: 0, y: 0, opacity: 0 }}
+                    animate={{ scale: 2.2, y: 80, opacity: 1 }}
+                    exit={{ opacity: 0, scale: 0 }}
+                    transition={{ duration: 0.7, delay: 0.9, type: "spring", bounce: 0.4 }}
+                    className="absolute z-50 flex items-center justify-center pointer-events-none drop-shadow-2xl left-[-200px] will-change-transform"
+                  >
+                    <img src={LUCARIO_SPRITE} alt="Lucario" className="w-40 h-40 drop-shadow-[0_0_25px_#00E5FF]" />
+                    
+                    {/* Aura Sphere Energy Core */}
+                    <motion.div
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: [0, 1.2, 5, 12], opacity: [0, 1, 1, 0] }}
+                      transition={{ duration: 1.2, delay: 1.3, times: [0, 0.2, 0.7, 1], ease: "easeIn" }}
+                      className="absolute rounded-full pointer-events-none z-[9999] will-change-transform"
+                      style={{
+                        width: 90,
+                        height: 90,
+                        background: 'radial-gradient(circle, #FFFFFF 0%, #00E5FF 50%, #2979FF 80%, transparent 100%)',
+                        boxShadow: '0 0 35px #00E5FF'
+                      }}
+                    />
+                  </motion.div>
+                )}
+                
+                {/* Clean Total Whiteout Flash */}
+                {mode === 'defeated_exploded' && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: [0, 0, 1, 0] }}
+                    transition={{ duration: 1.8, delay: 1.4, times: [0, 0.1, 0.4, 1] }}
+                    className="fixed inset-0 bg-white z-[9998] pointer-events-none will-change-opacity"
+                  />
+                )}
+              </>
+            )}
+          </AnimatePresence>
+          
+          {/* --- MEGA RAYQUAZA SUPER RARE SEQUENCE --- */}
+          <AnimatePresence>
+            {(mode === 'secret_rayquaza' || mode === 'defeated_vaporized') && (
+              <>
+                {/* Mega Rayquaza Descends */}
+                <motion.div 
+                  initial={{ y: -1000, scale: 2.5 }}
+                  animate={{ y: -140 }}
+                  exit={{ opacity: 0, y: -1000 }}
+                  transition={{ duration: 1.2, type: 'spring', bounce: 0.2 }}
+                  className="absolute z-50 flex items-center justify-center pointer-events-none drop-shadow-2xl will-change-transform"
+                >
+                  <img src={RAYQUAZA_SPRITE} alt="Mega Rayquaza" className="w-60 h-60 drop-shadow-[0_0_35px_#00FF00]" />
+                  
+                  {/* Hyper Beam */}
+                  {mode === 'defeated_vaporized' && (
+                    <motion.div
+                      initial={{ scaleY: 0, opacity: 0 }}
+                      animate={{ scaleY: [0, 1, 1, 0], opacity: [0, 1, 1, 0] }}
+                      transition={{ duration: 3, times: [0, 0.05, 0.85, 1] }}
+                      className="absolute top-[100px] w-48 h-[1200px] origin-top z-40 flex justify-center will-change-transform"
+                      style={{
+                        background: 'linear-gradient(180deg, #FFFFFF 0%, #00FF00 30%, #003300 100%)',
+                        boxShadow: '0 0 50px #00FF00'
+                      }}
+                    >
+                        {/* Inner core */}
+                        <div className="w-16 h-full bg-white/90 blur-sm" />
+                    </motion.div>
+                  )}
+                </motion.div>
+                
+                {/* Green/Black Whiteout */}
+                {mode === 'defeated_vaporized' && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: [0, 0, 1, 0] }}
+                    transition={{ duration: 2, delay: 1.8, times: [0, 0.1, 0.5, 1] }}
+                    className="fixed inset-0 bg-[#001100] z-[9998] pointer-events-none will-change-opacity"
+                  />
+                )}
+              </>
+            )}
+          </AnimatePresence>
           {/* --- BLASTOISE SEQUENCE --- */}
           <AnimatePresence>
             {(mode === 'secret_blastoise' || mode === 'defeated_washed') && (
@@ -458,50 +649,73 @@ export function Charizard() {
                 animate={{ x: -180, y: -20 }}
                 exit={{ opacity: 0, x: -800 }}
                 transition={{ duration: 1, type: 'spring', bounce: 0.4 }}
-                className="absolute z-50 flex items-center justify-center pointer-events-none"
+                className="absolute z-50 flex items-center justify-center pointer-events-none will-change-transform"
               >
                 <img src={BLASTOISE_SPRITE} alt="Blastoise" className="w-40 h-40 drop-shadow-[0_0_20px_#00BFFF]" />
                 
-                {/* Huge Hydro Pump */}
+                {/* Hydro Pump Cannon Blast & Swirling Water Beam */}
                 {mode === 'defeated_washed' && (
-                  <div className="absolute left-[100px] flex items-center z-40">
-                     <motion.div 
-                       initial={{ width: 0, opacity: 0 }}
-                       animate={{ width: 2000, opacity: [0, 1, 1, 1, 0] }}
-                       transition={{ duration: 2.5, times: [0, 0.05, 0.1, 0.8, 1] }}
-                       className="h-24 origin-left rounded-r-full relative flex items-center"
-                       style={{ 
-                         background: 'linear-gradient(90deg, #FFFFFF 0%, #00FFFF 20%, #0044FF 100%)', 
-                         filter: 'blur(2px)', 
-                         boxShadow: '0 0 50px #00BFFF, 0 0 100px #0044FF' 
-                       }}
-                     >
-                        <motion.div 
-                          animate={{ scaleY: [0.8, 1.2, 0.9, 1.1] }}
-                          transition={{ repeat: Infinity, duration: 0.1 }}
-                          className="w-full h-12 bg-white blur-md absolute left-0" 
-                        />
-                     </motion.div>
-                     
-                     {/* Water splashes */}
-                     {Array.from({ length: 40 }).map((_, i) => (
-                       <motion.div
-                         key={i}
-                         initial={{ x: 0, y: 0, scale: Math.random() * 2, opacity: 1 }}
-                         animate={{ 
-                           x: 1000 + Math.random() * 1000, 
-                           y: (Math.random() - 0.5) * 800,
-                           opacity: 0
-                         }}
-                         transition={{ 
-                           duration: 0.5 + Math.random() * 1,
-                           repeat: Infinity,
-                           ease: "easeOut"
-                         }}
-                         className="absolute w-4 h-4 bg-[#00FFFF] rounded-full blur-[1px]"
-                         style={{ left: Math.random() * 200 }}
-                       />
-                     ))}
+                  <div className="absolute left-[80px] top-[40px] flex items-center z-40 pointer-events-none">
+                    {/* Main High-Pressure Water Torrent */}
+                    <motion.div 
+                      initial={{ scaleX: 0, opacity: 0 }}
+                      animate={{ scaleX: [0, 1.2, 1.4, 0], opacity: [0, 1, 0.95, 0] }}
+                      transition={{ duration: 2.2, times: [0, 0.08, 0.82, 1], ease: "easeOut" }}
+                      className="h-28 w-[1400px] origin-left rounded-r-full relative flex items-center will-change-transform"
+                      style={{ 
+                        background: 'linear-gradient(90deg, #FFFFFF 0%, #00F0FF 20%, #0077FF 60%, #0033AA 100%)', 
+                        boxShadow: '0 0 35px #00BFFF, inset 0 0 20px #FFFFFF' 
+                      }}
+                    >
+                      {/* Inner High Velocity Jet Stream */}
+                      <motion.div 
+                        animate={{ scaleY: [0.7, 1.2, 0.8, 1.1] }}
+                        transition={{ repeat: Infinity, duration: 0.15 }}
+                        className="w-full h-12 bg-white/90 blur-xs absolute left-0 rounded-r-full" 
+                      />
+
+                      {/* Spiral Wave Outer Ring 1 */}
+                      <motion.div
+                        animate={{ x: [0, 600], opacity: [1, 0] }}
+                        transition={{ repeat: Infinity, duration: 0.4, ease: "linear" }}
+                        className="w-16 h-36 rounded-full border-4 border-[#00FFFF]/80 absolute -left-4"
+                      />
+
+                      {/* Spiral Wave Outer Ring 2 */}
+                      <motion.div
+                        animate={{ x: [0, 600], opacity: [1, 0] }}
+                        transition={{ repeat: Infinity, duration: 0.4, delay: 0.2, ease: "linear" }}
+                        className="w-16 h-36 rounded-full border-4 border-white/80 absolute -left-4"
+                      />
+                    </motion.div>
+
+                    {/* Cannon Muzzle Water Blast Flash */}
+                    <motion.div
+                      initial={{ scale: 0, opacity: 1 }}
+                      animate={{ scale: [0, 2, 1.5, 0], opacity: [1, 1, 0.8, 0] }}
+                      transition={{ duration: 2.2, times: [0, 0.1, 0.8, 1] }}
+                      className="absolute -left-6 w-24 h-24 rounded-full bg-radial from-white via-[#00E5FF] to-transparent pointer-events-none"
+                    />
+
+                    {/* Clean Water Jet Droplets (Lightweight) */}
+                    {Array.from({ length: 12 }).map((_, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+                        animate={{ 
+                          x: 400 + i * 70, 
+                          y: (i % 2 === 0 ? 1 : -1) * (20 + (i * 7)),
+                          opacity: [1, 0.8, 0],
+                          scale: [1, 1.5, 0]
+                        }}
+                        transition={{ 
+                          duration: 0.6 + (i * 0.08),
+                          repeat: Infinity,
+                          ease: "easeOut"
+                        }}
+                        className="absolute w-3 h-3 rounded-full bg-[#00FFFF] shadow-[0_0_10px_#00FFFF]"
+                      />
+                    ))}
                   </div>
                 )}
               </motion.div>
