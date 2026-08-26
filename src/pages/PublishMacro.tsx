@@ -196,13 +196,13 @@ export function PublishMacro() {
           <div className="grid gap-4">
             <Input 
               label="Creator / Player Name *"
-              placeholder="e.g. ViperX"
+              placeholder="Macro Creator Name"
               value={formData.creator_name}
               onChange={e => setFormData({...formData, creator_name: e.target.value})}
             />
             <Input 
               label="Macro Title *"
-              placeholder="e.g. Dragon + Godhuman One Shot 100-0"
+              placeholder="Idk just type a title for the macro ur gonna publish."
               value={formData.title}
               onChange={e => setFormData({...formData, title: e.target.value})}
             />
@@ -257,8 +257,8 @@ export function PublishMacro() {
               onChange={val => setFormData({...formData, macro_type: val})} 
             />
             <Input 
-              label="Bounty Boost Tier"
-              placeholder="e.g. 500K+ / 1M+"
+              label="Bounty Boost"
+              placeholder="Your / Creator's Bounty"
               value={formData.bounty_boost}
               onChange={e => setFormData({...formData, bounty_boost: e.target.value})}
             />
@@ -280,7 +280,7 @@ export function PublishMacro() {
           <div className="flex flex-col gap-1.5 w-full">
             <textarea
               className="w-full h-56 p-4 bg-cb-bg border border-cb-border rounded-xl text-xs text-cb-yellow font-mono focus:outline-none focus:border-cb-yellow focus:ring-1 focus:ring-cb-yellow/20 transition-all custom-scrollbar"
-              placeholder='{\n  "name": "Combo1",\n  "actions": [\n    { "key": "Z", "delay": 200 },\n    { "key": "X", "delay": 150 }\n  ]\n}'
+              placeholder='Paste The Import Code From The CokeBoys Script.'
               value={formData.macro_json}
               onChange={e => setFormData({...formData, macro_json: e.target.value})}
             />
@@ -296,7 +296,7 @@ export function PublishMacro() {
           <div className="flex flex-col gap-1.5 w-full">
             <textarea
               className="w-full h-32 p-4 bg-cb-bg border border-cb-border rounded-xl text-sm text-white placeholder-cb-text-muted focus:outline-none focus:border-cb-yellow focus:ring-1 focus:ring-cb-yellow/20 transition-all custom-scrollbar"
-              placeholder="e.g. Ensure you have high ping for this combo, wait for the fruit animation to finish..."
+              placeholder="..."
               value={formData.notes}
               onChange={e => setFormData({...formData, notes: e.target.value})}
             />
