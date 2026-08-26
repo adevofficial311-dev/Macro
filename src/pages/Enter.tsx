@@ -12,11 +12,11 @@ export function Enter() {
           COKEBOYS <span className="text-cb-yellow">CLIENT</span>
         </h1>
         <p className="text-xs sm:text-base md:text-lg font-medium text-cb-text-muted break-words">
-          Macro Database • Combo Mechanics • Verified Guides
+          Macro Guide • Combo Mechanics • Best Features
         </p>
       </div>
 
-      <div id="cinematic-video-container" className="w-full max-w-4xl aspect-video bg-cb-surface rounded-2xl border border-cb-border overflow-hidden shadow-2xl mb-8 relative group">
+      <div id="video-showcase-guide" className="w-full max-w-4xl aspect-video bg-cb-surface rounded-2xl border border-cb-border overflow-hidden shadow-2xl mb-8 relative group">
         <iframe 
           width="100%" 
           height="100%" 
