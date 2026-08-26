@@ -1,10 +1,3 @@
-/**
- * Charizard cinematic companion.
- *
- * Gameplay/cinematic timings and visual sequences are intentionally preserved.
- * Improvements focus on typing, cleanup, animation performance, accessibility,
- * and preventing stale timers from firing after a reset/unmount.
- */
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -16,37 +9,16 @@ const MEWTWO_SPRITE = "https://play.pokemonshowdown.com/sprites/ani/mewtwo.gif";
 const LUCARIO_SPRITE = "https://play.pokemonshowdown.com/sprites/ani/lucario.gif";
 const RAYQUAZA_SPRITE = "https://play.pokemonshowdown.com/sprites/ani/rayquaza-mega.gif";
 
-type CharizardMode =
-  | 'normal'
-  | 'spitting_fire'
-  | 'sleeping'
-  | 'waking'
-  | 'secret_pikachu'
-  | 'defeated_flying'
-  | 'secret_blastoise'
-  | 'defeated_washed'
-  | 'secret_mewtwo'
-  | 'defeated_exploded'
-  | 'secret_rayquaza'
-  | 'defeated_vaporized'
-  | 'hidden'
-  | 'nuking'
-  | 'destroyed';
+type CharizardMode = 
+  | 'normal' | 'spitting_fire' | 'sleeping' | 'waking' 
+  | 'secret_pikachu' | 'defeated_flying'
+  | 'secret_blastoise' | 'defeated_washed'
+  | 'hidden' | 'nuking' | 'destroyed';
 
 export function Charizard() {
   const [mode, setMode] = useState<CharizardMode>('normal');
   const [isMega, setIsMega] = useState(false);
-  type Ember = {
-    id: number;
-    angle: number;
-    distance: number;
-    duration: number;
-    size: number;
-    delay: number;
-    color: string;
-  };
-
-  const [embers, setEmbers] = useState<Ember[]>([]);
+  const [embers, setEmbers] = useState<any[]>([]);
   const [clickCount, setClickCount] = useState(0);
   
   // Refs for performance loop
@@ -58,14 +30,7 @@ export function Charizard() {
   
   const modeRef = useRef(mode);
   const isTiredRef = useRef(false);
-  const requestRef = useRef<number | null>(null);
-  const timeoutRefs = useRef<ReturnType<typeof setTimeout>[]>([]);
-
-  const schedule = (callback: () => void, delay: number) => {
-    const id = setTimeout(callback, delay);
-    timeoutRefs.current.push(id);
-    return id;
-  };
+  const requestRef = useRef<number>(null);
 
   useEffect(() => {
     modeRef.current = mode;
@@ -97,35 +62,15 @@ export function Charizard() {
     audioRayquazaRef.current.volume = 1.0;
     
     // Get tired after 12 seconds
-    const timer = schedule(() => {
+    const timer = setTimeout(() => {
       isTiredRef.current = true;
     }, 12000);
     
-    return () => {
-      clearTimeout(timer);
-
-      // Stop audio and release browser resources when the component unmounts.
-      [
-        audioNormalRef,
-        audioMegaRef,
-        audioPikachuRef,
-        audioBlastoiseRef,
-        audioMewtwoRef,
-        audioLucarioRef,
-        audioRayquazaRef,
-      ].forEach((audioRef) => {
-        audioRef.current?.pause();
-        if (audioRef.current) audioRef.current.currentTime = 0;
-        audioRef.current = null;
-      });
-    };
+    return () => clearTimeout(timer);
   }, []);
 
   const update = () => {
-    if (!charizardRef.current || !innerRef.current) {
-      requestRef.current = requestAnimationFrame(update);
-      return;
-    }
+    if (!charizardRef.current || !innerRef.current) return;
     
     const currentMode = modeRef.current;
     
@@ -187,18 +132,12 @@ export function Charizard() {
   useEffect(() => {
     requestRef.current = requestAnimationFrame(update);
     return () => {
-      if (requestRef.current !== null) {
-        cancelAnimationFrame(requestRef.current);
-        requestRef.current = null;
-      }
-
-      timeoutRefs.current.forEach(clearTimeout);
-      timeoutRefs.current = [];
+      if (requestRef.current) cancelAnimationFrame(requestRef.current);
     };
   }, []);
 
   const triggerScreenShake = (intensity: number, duration: number) => {
-    // Safety cap: keeps extreme cinematic effects from overwhelming the browser
+    // Clamp intensity to prevent heavy browser reflow and frame drops
     const safeIntensity = Math.min(intensity, 18);
     const root = document.getElementById('root') || document.body;
 
@@ -217,21 +156,10 @@ export function Charizard() {
     `;
     root.style.willChange = 'transform';
     root.style.animation = `charizard-shake ${duration}ms cubic-bezier(.36,.07,.19,.97) both`;
-    schedule(() => {
+    setTimeout(() => {
       root.style.animation = '';
       root.style.willChange = 'auto';
     }, duration);
-  };
-
-
-  const playAudio = (audioRef: React.MutableRefObject<HTMLAudioElement | null>) => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    audio.currentTime = 0;
-    void audio.play().catch(() => {
-      // Autoplay/browser policy can reject playback; visuals still continue.
-    });
   };
 
   const triggerNuke = () => {
@@ -243,20 +171,26 @@ export function Charizard() {
       charizardRef.current.style.transform = `translate3d(${pos.current.x}px, ${pos.current.y}px, 0)`;
     }
     
-    playAudio(audioMegaRef);
+    if (audioMegaRef.current) {
+      audioMegaRef.current.currentTime = 0;
+      audioMegaRef.current.play().catch(() => {});
+    }
     triggerScreenShake(8, 1500);
 
-    schedule(() => {
+    setTimeout(() => {
       triggerScreenShake(20, 600);
     }, 1500);
 
-    schedule(() => {
+    setTimeout(() => {
       triggerScreenShake(100, 4000); 
       if (audioMegaRef.current) {
         audioMegaRef.current.currentTime = 0;
         audioMegaRef.current.play().catch(() => {});
-        schedule(() => {
-          playAudio(audioNormalRef);
+        setTimeout(() => {
+          if (audioNormalRef.current) {
+            audioNormalRef.current.currentTime = 0;
+            audioNormalRef.current.play().catch(() => {});
+          }
         }, 150);
       }
       setMode('destroyed');
@@ -264,15 +198,12 @@ export function Charizard() {
   };
 
   const resetCharizard = () => {
-    timeoutRefs.current.forEach(clearTimeout);
-    timeoutRefs.current = [];
-
     setMode('normal');
     setIsMega(false);
     setClickCount(0);
     isTiredRef.current = false;
     
-    schedule(() => {
+    setTimeout(() => {
       isTiredRef.current = true;
     }, 12000);
     
@@ -291,11 +222,14 @@ export function Charizard() {
         innerRef.current.style.transform = `scaleX(-1)`;
       }
 
-      schedule(() => {
-        playAudio(audioMegaRef);
+      setTimeout(() => {
+        if (audioMegaRef.current) {
+          audioMegaRef.current.currentTime = 0;
+          audioMegaRef.current.play().catch(() => {});
+        }
         triggerScreenShake(10, 1000);
         
-        schedule(() => {
+        setTimeout(() => {
           // Choose 1 of 4 Random Secret Endings (One Super Rare!)
           const r = Math.random();
           if (r < 0.05) { // 5% SUPER RARE: MEGA RAYQUAZA
@@ -304,12 +238,12 @@ export function Charizard() {
               audioRayquazaRef.current.currentTime = 0;
               audioRayquazaRef.current.play().catch(() => {});
             }
-            schedule(() => {
+            setTimeout(() => {
               triggerScreenShake(150, 4000); // Earth-shattering screen shake
               setMode('defeated_vaporized');
-              schedule(() => {
+              setTimeout(() => {
                 setMode('hidden');
-                schedule(() => resetCharizard(), 1000);
+                setTimeout(() => resetCharizard(), 1000);
               }, 4000);
             }, 2000);
 
@@ -320,12 +254,12 @@ export function Charizard() {
               audioPikachuRef.current.currentTime = 0;
               audioPikachuRef.current.play().catch(() => {});
             }
-            schedule(() => {
+            setTimeout(() => {
               triggerScreenShake(30, 800);
               setMode('defeated_flying');
-              schedule(() => {
+              setTimeout(() => {
                 setMode('hidden');
-                schedule(() => resetCharizard(), 500);
+                setTimeout(() => resetCharizard(), 500);
               }, 1200);
             }, 1200);
 
@@ -336,7 +270,7 @@ export function Charizard() {
               audioPikachuRef.current.currentTime = 0;
               audioPikachuRef.current.play().catch(() => {});
             }
-            schedule(() => {
+            setTimeout(() => {
               if (audioMewtwoRef.current) {
                 audioMewtwoRef.current.currentTime = 0;
                 audioMewtwoRef.current.play().catch(() => {});
@@ -344,7 +278,7 @@ export function Charizard() {
               triggerScreenShake(40, 2500); // Powerful psychic shake
               setMode('defeated_exploded');
               
-              schedule(() => {
+              setTimeout(() => {
                 if (audioLucarioRef.current) {
                   audioLucarioRef.current.currentTime = 0;
                   audioLucarioRef.current.play().catch(() => {});
@@ -353,7 +287,7 @@ export function Charizard() {
               }, 900); // Lucario strikes mid-explosion
 
               // After the total psychic/aura explosion, the web is destroyed!
-              schedule(() => {
+              setTimeout(() => {
                 setMode('destroyed');
               }, 2800);
             }, 1200);
@@ -365,12 +299,12 @@ export function Charizard() {
               audioBlastoiseRef.current.currentTime = 0;
               audioBlastoiseRef.current.play().catch(() => {});
             }
-            schedule(() => {
+            setTimeout(() => {
               triggerScreenShake(40, 2500); // Continuous shake for water beam
               setMode('defeated_washed');
-              schedule(() => {
+              setTimeout(() => {
                 setMode('hidden');
-                schedule(() => resetCharizard(), 500);
+                setTimeout(() => resetCharizard(), 500);
               }, 2500);
             }, 1000); // Slide in time
           }
@@ -392,9 +326,11 @@ export function Charizard() {
     setIsMega(goesMega);
     
     if (goesMega && audioMegaRef.current) {
-      playAudio(audioMegaRef);
+      audioMegaRef.current.currentTime = 0;
+      audioMegaRef.current.play().catch(() => {});
     } else if (!goesMega && audioNormalRef.current) {
-      playAudio(audioNormalRef);
+      audioNormalRef.current.currentTime = 0;
+      audioNormalRef.current.play().catch(() => {});
     }
 
     triggerScreenShake(goesMega ? 25 : 12, goesMega ? 1500 : 1000);
@@ -414,7 +350,7 @@ export function Charizard() {
     });
     setEmbers(newEmbers);
     
-    schedule(() => {
+    setTimeout(() => {
       setMode('normal');
       setTimeout(() => setIsMega(false), 500);
     }, goesMega ? 1500 : 1200);
@@ -497,7 +433,7 @@ export function Charizard() {
 
       <div
         ref={charizardRef}
-        className="fixed top-0 left-0 z-[9999] cursor-pointer pointer-events-auto select-none touch-manipulation"
+        className="fixed top-0 left-0 z-[9999] cursor-pointer pointer-events-auto"
         style={{
           width: isMega ? 100 : 80,
           height: isMega ? 100 : 80,
@@ -506,15 +442,6 @@ export function Charizard() {
           transition: 'opacity 0.2s'
         }}
         onClick={handleClick}
-        role="button"
-        tabIndex={0}
-        aria-label="Charizard cinematic companion"
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            handleClick();
-          }
-        }}
       >
         <div 
           ref={innerRef}
@@ -591,17 +518,15 @@ export function Charizard() {
           </AnimatePresence>
 
           
-          {/* --- MEWTWO SEQUENCE ---
-              Kept intentionally viewport-contained: no giant negative offsets,
-              no off-screen character staging, and smaller impact effects. */}
+          {/* --- MEWTWO SEQUENCE --- */}
           <AnimatePresence>
             {(mode === 'secret_mewtwo' || mode === 'defeated_exploded') && (
               <>
                 {/* Pikachu appears first */}
                 {mode === 'secret_mewtwo' && (
                   <motion.div 
-                    initial={{ x: 260, y: -40, scale: 1.15, opacity: 0 }}
-                    animate={{ x: 0, y: -70, scale: 1, opacity: 1 }}
+                    initial={{ x: 800, y: -100, scale: 1.5 }}
+                    animate={{ x: 180, y: -60 }}
                     exit={{ opacity: 0, y: 1000 }}
                     transition={{ duration: 0.6, type: 'spring', bounce: 0.3 }}
                     className="absolute z-50 flex items-center justify-center pointer-events-none drop-shadow-xl will-change-transform"
@@ -619,7 +544,7 @@ export function Charizard() {
                     transition={{ duration: 0.3, ease: "easeIn" }}
                     className="absolute z-50 flex items-center justify-center pointer-events-none drop-shadow-2xl will-change-transform"
                   >
-                    <img src={MEWTWO_SPRITE} alt="Mewtwo" className="w-36 h-36 sm:w-44 sm:h-44 drop-shadow-[0_0_25px_#9C27B0]" />
+                    <img src={MEWTWO_SPRITE} alt="Mewtwo" className="w-48 h-48 drop-shadow-[0_0_25px_#9C27B0]" />
                     
                     {/* Psychic Blast Ring */}
                     <motion.div
@@ -641,7 +566,7 @@ export function Charizard() {
                     transition={{ duration: 0.7, delay: 0.9, type: "spring", bounce: 0.4 }}
                     className="absolute z-50 flex items-center justify-center pointer-events-none drop-shadow-2xl left-[-200px] will-change-transform"
                   >
-                    <img src={LUCARIO_SPRITE} alt="Lucario" className="w-28 h-28 sm:w-36 sm:h-36 drop-shadow-[0_0_25px_#00E5FF]" />
+                    <img src={LUCARIO_SPRITE} alt="Lucario" className="w-40 h-40 drop-shadow-[0_0_25px_#00E5FF]" />
                     
                     {/* Aura Sphere Energy Core */}
                     <motion.div
@@ -650,8 +575,8 @@ export function Charizard() {
                       transition={{ duration: 1.2, delay: 1.3, times: [0, 0.2, 0.7, 1], ease: "easeIn" }}
                       className="absolute rounded-full pointer-events-none z-[9999] will-change-transform"
                       style={{
-                        width: 70,
-                        height: 70,
+                        width: 90,
+                        height: 90,
                         background: 'radial-gradient(circle, #FFFFFF 0%, #00E5FF 50%, #2979FF 80%, transparent 100%)',
                         boxShadow: '0 0 35px #00E5FF'
                       }}
@@ -664,7 +589,7 @@ export function Charizard() {
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: [0, 0, 1, 0] }}
-                    transition={{ duration: 1.1, delay: 1.4, times: [0, 0.18, 0.45, 1] }}
+                    transition={{ duration: 1.8, delay: 1.4, times: [0, 0.1, 0.4, 1] }}
                     className="fixed inset-0 bg-white z-[9998] pointer-events-none will-change-opacity"
                   />
                 )}
@@ -746,7 +671,7 @@ export function Charizard() {
                       <motion.div 
                         animate={{ scaleY: [0.7, 1.2, 0.8, 1.1] }}
                         transition={{ repeat: Infinity, duration: 0.15 }}
-                        className="w-full h-12 bg-white/90 blur-sm absolute left-0 rounded-r-full" 
+                        className="w-full h-12 bg-white/90 blur-xs absolute left-0 rounded-r-full" 
                       />
 
                       {/* Spiral Wave Outer Ring 1 */}
