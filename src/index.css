@@ -13,21 +13,51 @@
   --color-cb-text: #F5F5F5;
   --color-cb-text-muted: #A3A3A3;
 
-  
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-display: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: var(--cb-font-sans, 'Pixelify Sans', sans-serif);
+  --font-display: var(--cb-font-display, 'Press Start 2P', cursive, monospace);
+  --font-pixel: var(--cb-font-pixel, 'Press Start 2P', monospace);
+  --font-mono: var(--cb-font-mono, 'VT323', monospace);
 }
 
 @layer base {
   :root {
     color-scheme: dark;
+    --cb-font-sans: 'Pixelify Sans', sans-serif;
+    --cb-font-display: 'Press Start 2P', cursive, monospace;
+    --cb-font-pixel: 'Press Start 2P', monospace;
+    --cb-font-mono: 'VT323', monospace;
+    --cb-font-scale: 1;
+    --cb-letter-spacing: 0.02em;
   }
+  
+  html {
+    font-size: calc(16px * var(--cb-font-scale, 1));
+  }
+
   body {
-    @apply bg-cb-bg text-cb-text font-sans antialiased selection:bg-cb-yellow selection:text-black;
+    @apply bg-cb-bg text-cb-text antialiased selection:bg-cb-yellow selection:text-black;
+    font-family: var(--cb-font-sans);
     overflow-x: hidden;
+    letter-spacing: var(--cb-letter-spacing, 0.02em);
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
+
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display tracking-tight font-bold;
+    font-family: var(--cb-font-display);
+    overflow-wrap: break-word;
+    word-break: break-word;
+    letter-spacing: 0.04em;
+    line-height: 1.25;
+  }
+
+  /* Responsive clamp and word break safety for all buttons, chips, and code snippets */
+  button, a, input, select, textarea {
+    font-family: inherit;
+  }
+
+  code, pre {
+    font-family: var(--cb-font-mono);
   }
 }
 
