@@ -9,14 +9,14 @@ export function Home() {
         
         {/* Big Impact Headline */}
         <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-black text-white tracking-tight leading-tight max-w-4xl mb-6 break-words">
-          MASTER YOUR BUILD.<br />
+          MASTER YOUR BUILDS.<br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-cb-yellow via-cb-yellow-hover to-cb-red">
-            DOMINATE THE ARENA.
+            DOMINATE BLOXFRUITS.
           </span>
         </h1>
         
         <p className="text-sm sm:text-base md:text-lg text-cb-text-muted max-w-2xl mb-10 leading-relaxed break-words">
-          The ultimate verified macro & loadout repository. Discover one-shot combos, infinite loops, and share your custom setups with the CokeBoys community.
+          The ultimate macro & loadout repository. Discover one-shot combos, infinite combos, and share your custom macros with the CokeBoys community.
         </p>
 
         {/* Hero CTAs */}
@@ -64,10 +64,10 @@ export function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
             <h2 className="text-2xl sm:text-3xl font-display font-black text-white mb-3">
-              Engineered For High-Tier Gameplay
+              Engineered For Best Experience 
             </h2>
             <p className="text-cb-text-muted text-base max-w-xl mx-auto">
-              Everything you need to optimize your execution, test new mechanics, and climb the leaderboards.
+              Everything you need to optimize your execution, test new mechanics, and destroy anything in your path.
             </p>
           </div>
 
@@ -79,7 +79,7 @@ export function Home() {
               </div>
               <h3 className="text-lg font-bold text-white mb-2 font-display">Filtered Search</h3>
               <p className="text-cb-text-muted text-sm leading-relaxed">
-                Quickly locate combos customized for your Fruit (Dragon, Kitsune, Dough), Sword, Melee, and Gun loadout with full sorting.
+                Quickly locate combos customized for your Fruit, Sword, Melee, and Gun loadout with full sorting.
               </p>
             </div>
 
