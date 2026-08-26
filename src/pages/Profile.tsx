@@ -56,7 +56,7 @@ export function Profile() {
             {name?.charAt(0)}
           </span>
         </div>
-        <h1 className="text-3xl font-display font-black text-white mb-2">@{name}</h1>
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-display font-black text-white mb-2 break-all">@{name}</h1>
         <div className="flex items-center gap-3 text-xs text-cb-text-muted">
           <span className="px-2.5 py-0.5 rounded bg-cb-red/20 text-cb-red border border-cb-red/30 font-bold uppercase">
             Verified Creator

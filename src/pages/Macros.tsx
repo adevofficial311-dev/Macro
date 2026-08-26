@@ -164,8 +164,7 @@ export function Macros() {
         <div className="flex items-center justify-between mb-6 pb-4 border-b border-cb-border/80">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <h1 className="text-2xl sm:text-3xl font-display font-black text-white">Community Macros</h1>
-              <span className="w-2 h-2 rounded-full bg-cb-red" />
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-display font-black text-white break-words">Community Macros</h1>
             </div>
             <p className="text-xs sm:text-sm text-cb-text-muted">
               Showing {filteredMacros.length} verified builds across all loadouts

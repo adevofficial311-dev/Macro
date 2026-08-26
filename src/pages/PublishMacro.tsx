@@ -163,8 +163,7 @@ export function PublishMacro() {
   return (
     <div className="w-full max-w-3xl mx-auto px-4 py-12">
       <div className="flex items-center gap-2 mb-2">
-        <span className="w-2.5 h-2.5 rounded-full bg-cb-red animate-pulse" />
-        <h1 className="text-3xl font-display font-black text-white">Publish a Macro</h1>
+        <h1 className="text-2xl sm:text-3xl font-display font-black text-white break-words">Publish a Macro</h1>
       </div>
       <p className="text-cb-text-muted mb-8 text-sm">
         Share your custom setup and combo timings with verified CokeBoys players.

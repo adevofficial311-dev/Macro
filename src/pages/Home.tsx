@@ -8,14 +8,14 @@ export function Home() {
       <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 md:pt-24 pb-20 md:pb-28 flex flex-col items-center text-center">
         
         {/* Big Impact Headline */}
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-display font-black text-white tracking-tight leading-none max-w-4xl mb-6">
+        <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-black text-white tracking-tight leading-tight max-w-4xl mb-6 break-words">
           MASTER YOUR BUILD.<br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-cb-yellow via-cb-yellow-hover to-cb-red">
             DOMINATE THE ARENA.
           </span>
         </h1>
         
-        <p className="text-base sm:text-lg md:text-xl text-cb-text-muted max-w-2xl mb-10 leading-relaxed">
+        <p className="text-sm sm:text-base md:text-lg text-cb-text-muted max-w-2xl mb-10 leading-relaxed break-words">
           The ultimate verified macro & loadout repository. Discover one-shot combos, infinite loops, and share your custom setups with the CokeBoys community.
         </p>
 
@@ -39,22 +39,22 @@ export function Home() {
         </div>
 
         {/* Quick Highlights Bar */}
-        <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-4xl pt-8 border-t border-cb-border/60">
+        <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 w-full max-w-4xl pt-8 border-t border-cb-border/60">
           <div className="flex flex-col items-center">
-            <span className="text-2xl font-black text-white font-display">100%</span>
-            <span className="text-xs text-cb-text-muted uppercase tracking-wider font-semibold">Free to Use</span>
+            <span className="text-lg sm:text-2xl font-black text-white font-display">100%</span>
+            <span className="text-[10px] sm:text-xs text-cb-text-muted uppercase tracking-wider font-semibold text-center">Free to Use</span>
           </div>
           <div className="flex flex-col items-center">
-            <span className="text-2xl font-black text-cb-yellow font-display">1-Click</span>
-            <span className="text-xs text-cb-text-muted uppercase tracking-wider font-semibold">JSON Export</span>
+            <span className="text-lg sm:text-2xl font-black text-cb-yellow font-display">1-Click</span>
+            <span className="text-[10px] sm:text-xs text-cb-text-muted uppercase tracking-wider font-semibold text-center">JSON Export</span>
           </div>
           <div className="flex flex-col items-center">
-            <span className="text-2xl font-black text-cb-red font-display">PvP & PvE</span>
-            <span className="text-xs text-cb-text-muted uppercase tracking-wider font-semibold">Tested Builds</span>
+            <span className="text-lg sm:text-2xl font-black text-cb-red font-display">PvP & PvE</span>
+            <span className="text-[10px] sm:text-xs text-cb-text-muted uppercase tracking-wider font-semibold text-center">Tested Builds</span>
           </div>
           <div className="flex flex-col items-center">
-            <span className="text-2xl font-black text-white font-display">Live</span>
-            <span className="text-xs text-cb-text-muted uppercase tracking-wider font-semibold">Community Feed</span>
+            <span className="text-lg sm:text-2xl font-black text-white font-display">Live</span>
+            <span className="text-[10px] sm:text-xs text-cb-text-muted uppercase tracking-wider font-semibold text-center">Community Feed</span>
           </div>
         </div>
       </section>

@@ -177,7 +177,7 @@ export function ViewMacro() {
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-4xl font-display font-black text-white tracking-tight leading-tight mb-3">
+            <h1 className="text-xl sm:text-3xl md:text-4xl font-display font-black text-white tracking-tight leading-tight mb-3 break-words">
               {macro.title}
             </h1>
 
