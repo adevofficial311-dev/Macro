@@ -24,6 +24,14 @@ export function ViewMacro() {
   const [profileOpen, setProfileOpen] = useState(false);
 
   useEffect(() => {
+    return () => {
+      if (resolvedVideoUrl) {
+        URL.revokeObjectURL(resolvedVideoUrl);
+      }
+    };
+  }, [resolvedVideoUrl]);
+
+  useEffect(() => {
     if (!id) return;
     
     // Fetch Macro
@@ -280,6 +288,8 @@ export function ViewMacro() {
                   <video 
                     src={resolvedVideoUrl} 
                     controls 
+                    preload="metadata"
+                    playsInline
                     className="w-full h-full object-contain"
                   />
                 ) : null}
