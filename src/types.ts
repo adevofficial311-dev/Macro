@@ -20,6 +20,7 @@ export interface Comment {
   id: string;
   macro_id: string;
   creator_name: string;
+  creator_avatar?: string;
   content: string;
   created_at: number;
 }
