@@ -48,8 +48,9 @@ export const FRUIT_OPTIONS = FRUITS.map(fruit => ({
 }));
 
 export const SWORDS = [
+
   // Legendary
-  "Bisento", "Buddy Sword", "Canvander", "Cursed Dual Katana", "Dark Dagger", "Dog Blade", "Dragon Trident",
+  "Bisento", "TTK", "Hallow Scythe", "Dark Blade", "Buddy Sword", "Canvander", "Cursed Dual Katana", "Dark Dagger", "Dog Blade", "Dragon Trident",
   "Dragonheart", "Fox Lamp", "Gravity Blade", "Koko", "Midnight Blade", "Oroshi",
   "Pole (2nd Form)", "Rengoku", "Saddi", "Shark Anchor", "Shisui", "Tushita", "Wando", "Yama",
   // Rare
@@ -58,7 +59,7 @@ export const SWORDS = [
   // Uncommon
   "Iron Mace", "Shark Saw", "Triple Katana", "Twin Hooks",
   // Common
-  "Combat Knife", "Cutlass", "Dual Katana", "Katana", "Steel Blade"
+  "Cutlass", "Dual Katana", "Katana", "Steel Blade"
 ].sort();
 
 export const SWORD_OPTIONS = SWORDS.map(sword => ({
