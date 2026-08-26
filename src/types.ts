@@ -12,6 +12,8 @@ export interface Macro {
   macro_json: string;
   comment_count: number;
   view_count: number;
+  views?: string[];
+  likes?: string[];
   created_at: number;
   updated_at: number;
 }
